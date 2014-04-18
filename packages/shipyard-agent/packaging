@@ -1,0 +1,14 @@
+set -e # exit immediately if a simple command exits with a non-zero status
+set -u # report the usage of uninitialized variables
+
+# Detect # of CPUs so make jobs can be parallelized
+CPUS=`grep -c ^processor /proc/cpuinfo`
+
+# We grab the latest versions that are in the directory
+SHIPYARD_VERSION=`ls -r shipyard/shipyard-agent-* | sed 's/shipyard\/shipyard-agent-\(.*\)/\1/' | head -1`
+
+# Copy Shipyard agent package
+echo "Copying Shipyard agent ${SHIPYARD_VERSION}..."
+mkdir -p ${BOSH_INSTALL_TARGET}/bin
+cp -a ${BOSH_COMPILE_TARGET}/shipyard/shipyard-agent-${SHIPYARD_VERSION} ${BOSH_INSTALL_TARGET}/bin/shipyard-agent
+chmod +x ${BOSH_INSTALL_TARGET}/bin/shipyard-agent

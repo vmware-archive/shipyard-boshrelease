@@ -1,0 +1,125 @@
+<% deployment_name = 'shipyard' %>
+<% os = 'ubuntu' %>
+<% tld = 'microbosh' %>
+<% num_nodes = 5 %>
+<% director_uuid = 'CHANGE-ME' %>
+---
+name: <%= deployment_name %>
+director_uuid: <%= director_uuid %>
+
+releases:
+ - name: shipyard
+   version: latest
+
+compilation:
+  workers: 5
+  network: default
+  reuse_compilation_vms: true
+  cloud_properties:
+    instance_type: m1.xlarge
+
+update:
+  canaries: 0
+  canary_watch_time: 30000-240000
+  update_watch_time:  30000-240000
+  max_in_flight: <%= 5 + num_nodes %>
+  serial: false
+
+networks:
+  - name: default
+    type: dynamic
+    cloud_properties:
+      security_groups: ['default']
+
+resource_pools:
+  - name: shipyard
+    network: default
+    size: 5
+    stemcell:
+      name: bosh-aws-xen-<%= os %>
+      version: latest
+    cloud_properties:
+      instance_type: m1.small
+
+  - name: nodes
+    network: default
+    size: <%= num_nodes %>
+    stemcell:
+      name: bosh-aws-xen-<%= os %>
+      version: latest
+    cloud_properties:
+      instance_type: m1.xlarge
+
+jobs:
+  - name: db
+    templates:
+      - name: docker
+      - name: shipyard_db
+    instances: 1
+    resource_pool: shipyard
+    persistent_disk: 65536
+    networks:
+      - name: default
+        default: [dns, gateway]
+
+  - name: redis
+    templates:
+      - name: docker
+      - name: shipyard_redis
+    instances: 1
+    resource_pool: shipyard
+    networks:
+      - name: default
+        default: [dns, gateway]
+
+  - name: router
+    templates:
+      - name: docker
+      - name: shipyard_router
+    instances: 1
+    resource_pool: shipyard
+    networks:
+      - name: default
+        default: [dns, gateway]
+
+  - name: lb
+    templates:
+      - name: docker
+      - name: shipyard_lb
+    instances: 1
+    resource_pool: shipyard
+    networks:
+      - name: default
+        default: [dns, gateway]
+
+  - name: shipyard
+    templates:
+      - name: docker
+      - name: shipyard
+    instances: 1
+    resource_pool: shipyard
+    networks:
+      - name: default
+        default: [dns, gateway]
+
+  - name: node
+    templates:
+      - name: docker
+      - name: shipyardagent
+    instances: <%= num_nodes %>
+    resource_pool: nodes
+    networks:
+      - name: default
+        default: [dns, gateway]
+
+properties:
+  shipyard:
+    host: 0.shipyard.default.<%= deployment_name %>.<%= tld %>
+    port: 80
+    db:
+      host: 0.db.default.<%= deployment_name %>.<%= tld %>
+    redis:
+      host: 0.redis.default.<%= deployment_name %>.<%= tld %>
+    lb:
+      routers:
+        - 0.router.default.<%= deployment_name %>.<%= tld %>

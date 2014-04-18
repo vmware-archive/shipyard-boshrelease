@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+#
+# Shipyard properties
+#
+
+# Directory to store the Shipyard load balancerconfiguration files
+export SHIPYARD_LB_CONF_DIR=$JOB_DIR/config
+
+# Directory to store the Shipyard load balancer logs
+export SHIPYARD_LB_LOG_DIR=$LOG_DIR
+
+# Directory to store the Shipyard load balancer process IDs
+export SHIPYARD_LB_PID_DIR=$RUN_DIR
+
+# Directory to store the Shipyard load balancer data files
+export SHIPYARD_LB_STORE_DIR=$STORE_DIR
+
+# Directory to store the Shipyard load balancer temp files
+export SHIPYARD_LB_TMP_DIR=$TMP_DIR
+
+# Directory to store the Shipyard load balancer SSL files
+export SHIPYARD_LB_CERTS_DIR=$SHIPYARD_LB_STORE_DIR/sslcerts
+
+# User which will own the Docker services
+export DOCKER_USER="<%= p('docker.user') %>"
+
+# Group which will own the Docker services
+export DOCKER_GROUP="<%= p('docker.group') %>"
+
+# Shipyard redis address/hostname
+export SHIPYARD_REDIS_HOST="<%= p('shipyard.redis.host') %>"
+
+# TCP Port where Shipyard redis will listen to
+export SHIPYARD_REDIS_PORT="<%= p('shipyard.redis.port') %>"
+
+<% if_p('shipyard.lb.resolver') do |resolver| %>
+# Shipyard load balancer DNS resolver for Nginx (default: system dns)
+export SHIPYARD_LB_RESOLVER="--env NGINX_RESOLVER=\"<%= resolver %>\""
+<% end %>
+
+<% if_p('shipyard.lb.routers') do |routers| %>
+<% lb_routers = routers.map { |router| "#{router}:#{p('shipyard.router.port')}" }.join(' ') %>
+# Shipyard load balancer router upstreams address/hostname
+export SHIPYARD_LB_ROUTERS="<%= lb_routers %>"
+<% end %>

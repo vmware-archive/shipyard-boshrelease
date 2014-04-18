@@ -1,0 +1,5 @@
+---
+name: shipyard-agent
+dependencies: {}
+files:
+  - shipyard/shipyard-agent-0.2.5

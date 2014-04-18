@@ -1,0 +1,38 @@
+---
+name: shipyardagent
+
+packages:
+  - bosh-helpers
+  - shipyard-agent
+
+templates:
+  bin/job_properties.sh.erb: bin/job_properties.sh
+  bin/shipyardagent_ctl: bin/shipyardagent_ctl
+
+properties:
+  docker.tcp_port:
+    description: 'Local Docker daemon TCP port'
+    default: '4243'
+  shipyard.host:
+    description: 'Shipyard Host'
+  shipyard.port:
+    description: 'Shipyard port'
+    default: '8000'
+  shipyard.agent.user:
+    description: 'User which will own the Shipyard Agent services'
+    default: 'root'
+  shipyard.agent.group:
+    description: 'Group which will own the Shipyard Agent services'
+    default: 'vcap'
+  shipyard.agent.address:
+    description: 'Shipyard Agent listen address'
+    default: '0.0.0.0'
+  shipyard.agent.port:
+    description: 'Shipyard Agent listen port'
+    default: '4500'
+  shipyard.agent.interval:
+    description: 'Shipyard Agent run interval (seconds)'
+    default: '5'
+  shipyard.agent.metric-interval:
+    description: 'Shipyard Agent metric interval (seconds)'
+    default: '60'

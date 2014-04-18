@@ -1,0 +1,36 @@
+---
+name: shipyard_router
+
+packages:
+  - bosh-helpers
+  - docker
+
+templates:
+  bin/job_properties.sh.erb: bin/job_properties.sh
+  bin/shipyard_router_ctl: bin/shipyard_router_ctl
+
+properties:
+  docker.user:
+    description: 'User which will own the Docker services'
+    default: 'root'
+  docker.group:
+    description: 'Group which will own the Docker services'
+    default: 'vcap'
+  shipyard.redis.host:
+    description: 'Shipyard redis address/hostname'
+    default: '127.0.0.1'
+  shipyard.redis.port:
+    description: 'TCP Port where Shipyard redis will listen to'
+    default: '6379'
+  shipyard.router.port:
+    description: 'TCP Port where Shipyard router will listen to'
+    default: '8080'
+  shipyard.router.workers:
+    description: 'Shipyard router number of workers'
+    default: '5'
+  shipyard.router.max_sockets:
+    description: 'Shipyard router maximum number of sockets'
+    default: '100'
+  shipyard.router.dead_backend_ttl:
+    description: 'Shipyard router number of seconds before backend is labeled dead'
+    default: '30'

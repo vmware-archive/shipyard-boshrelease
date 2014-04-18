@@ -1,0 +1,69 @@
+#!/bin/bash
+
+set -e # exit immediately if a simple command exits with a non-zero status
+
+# Setup common env vars and folders
+source /var/vcap/packages/bosh-helpers/ctl_setup.sh 'shipyard_router'
+export SHIPYARD_ROUTER_PID_FILE=${SHIPYARD_ROUTER_PID_DIR}/shipyard_router.pid
+export SHIPYARD_ROUTER_ID_FILE=${SHIPYARD_ROUTER_PID_DIR}/shipyard_router.id
+
+# Set the hostname
+if hostname=$(public_hostname); then
+  hostname $hostname
+else
+  hostname <%= index %>.<%= name %>.<%= spec.networks.methods(false).grep(/[^=]$/).first.to_s %>.<%= spec.deployment %>.<%= spec.dns_domain_name %>
+fi
+
+case $1 in
+
+  start)
+    pid_guard ${SHIPYARD_ROUTER_PID_FILE} ${JOB_NAME}
+    echo $$ > ${SHIPYARD_ROUTER_PID_FILE}
+
+    # Create Docker user & group
+    create_group ${DOCKER_GROUP}
+    create_user ${DOCKER_USER} ${DOCKER_GROUP}
+
+    # Stop and remove previously Shipyard Router Container
+    chpst -u ${DOCKER_USER}:${DOCKER_GROUP} docker -H unix:///var/vcap/sys/run/docker/docker.sock stop shipyard_router || true
+    chpst -u ${DOCKER_USER}:${DOCKER_GROUP} docker -H unix:///var/vcap/sys/run/docker/docker.sock rm shipyard_router || true
+    rm ${SHIPYARD_ROUTER_ID_FILE} || true
+
+    # Start Shipyard Router container
+    docker_command="docker --host unix:///var/vcap/sys/run/docker/docker.sock \
+           run --detach \
+           --name shipyard_router \
+           --cidfile ${SHIPYARD_ROUTER_ID_FILE} \
+           --publish ${SHIPYARD_ROUTER_PORT}:80 \
+           --env REDIS_HOST="${SHIPYARD_REDIS_HOST}" \
+           --env REDIS_PORT="${SHIPYARD_REDIS_PORT}" \
+           --env ROUTER_WORKERS="${SHIPYARD_ROUTER_WORKERS}" \
+           --env ROUTER_MAX_SOCKETS="${SHIPYARD_ROUTER_MAX_SOCKETS}" \
+           --env ROUTER_DEAD_BACKEND_TTL="${SHIPYARD_ROUTER_DEAD_BACKEND_TTL}" \
+           shipyard/router"
+
+    echo "$(date) Running command: ${docker_command}"
+    chpst -u ${DOCKER_USER}:${DOCKER_GROUP} ${docker_command} \
+        >>${LOG_DIR}/${OUTPUT_LABEL}.stdout.log \
+        2>>${LOG_DIR}/${OUTPUT_LABEL}.stderr.log
+
+    # Grab Shipyard Router Container process pid
+    container_id=$(cat ${SHIPYARD_ROUTER_ID_FILE})
+    pid_process=$(chpst -u ${DOCKER_USER}:${DOCKER_GROUP} docker -H unix:///var/vcap/sys/run/docker/docker.sock inspect ${container_id} | grep Pid | awk '{ gsub(",", ""); print $2 }')
+    echo ${pid_process} > ${SHIPYARD_ROUTER_PID_FILE}
+    ;;
+
+  stop)
+    # Stop and remove Shipyard Router Container
+    chpst -u ${DOCKER_USER}:${DOCKER_GROUP} docker -H unix:///var/vcap/sys/run/docker/docker.sock stop shipyard_router || true
+    chpst -u ${DOCKER_USER}:${DOCKER_GROUP} docker -H unix:///var/vcap/sys/run/docker/docker.sock rm shipyard_router || true
+    rm ${SHIPYARD_ROUTER_ID_FILE} || true
+    ;;
+
+  *)
+    echo "Usage: $0 {start|stop}"
+    exit 1
+    ;;
+
+esac
+exit 0

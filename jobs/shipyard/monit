@@ -1,0 +1,5 @@
+check process shipyard with pidfile /var/vcap/sys/run/shipyard/shipyard.pid
+  group vcap
+  start program "/var/vcap/packages/bosh-helpers/monit_debugger shipyard_ctl '/var/vcap/jobs/shipyard/bin/shipyard_ctl start'"
+  stop program "/var/vcap/packages/bosh-helpers/monit_debugger shipyard_ctl '/var/vcap/jobs/shipyard/bin/shipyard_ctl stop'"
+  depends on docker

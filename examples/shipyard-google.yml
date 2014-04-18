@@ -1,0 +1,90 @@
+<% deployment_name = 'shipyard' %>
+<% os = 'ubuntu' %>
+<% tld = 'microbosh' %>
+<% num_nodes = 5 %>
+<% director_uuid = 'CHANGE-ME' %>
+---
+name: <%= deployment_name %>
+director_uuid: <%= director_uuid %>
+
+releases:
+ - name: shipyard
+   version: latest
+
+compilation:
+  workers: 5
+  network: default
+  reuse_compilation_vms: true
+  cloud_properties:
+    instance_type: n1-standard-8
+
+update:
+  canaries: 0
+  canary_watch_time: 30000-240000
+  update_watch_time:  30000-240000
+  max_in_flight: <%= 1 + num_nodes %>
+  serial: false
+
+networks:
+  - name: default
+    type: dynamic
+    cloud_properties:
+      ephemeral_external_ip: true
+      tags:
+        - <%= deployment_name %>
+
+resource_pools:
+  - name: shipyard
+    network: default
+    size: 1
+    stemcell:
+      name: bosh-google-kvm-<%= os %>
+      version: latest
+    cloud_properties:
+      instance_type: n1-highmem-8
+
+  - name: nodes
+    network: default
+    size: <%= num_nodes %>
+    stemcell:
+      name: bosh-google-kvm-<%= os %>
+      version: latest
+    cloud_properties:
+      instance_type: n1-highmem-8
+
+jobs:
+  - name: shipyard
+    templates:
+      - name: docker
+      - name: shipyard_db
+      - name: shipyard_redis
+      - name: shipyard_router
+      - name: shipyard_lb
+      - name: shipyard
+    instances: 1
+    resource_pool: shipyard
+    persistent_disk: 65536
+    networks:
+      - name: default
+        default: [dns, gateway]
+
+  - name: node
+    templates:
+      - name: docker
+      - name: shipyardagent
+    instances: <%= num_nodes %>
+    resource_pool: nodes
+    networks:
+      - name: default
+        default: [dns, gateway]
+
+properties:
+  shipyard:
+    host: 0.shipyard.default.<%= deployment_name %>.<%= tld %>
+    db:
+      host: 0.shipyard.default.<%= deployment_name %>.<%= tld %>
+    redis:
+      host: 0.shipyard.default.<%= deployment_name %>.<%= tld %>
+    lb:
+      routers:
+        - 0.shipyard.default.<%= deployment_name %>.<%= tld %>

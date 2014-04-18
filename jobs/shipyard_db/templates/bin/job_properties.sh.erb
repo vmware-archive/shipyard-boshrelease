@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+#
+# Shipyard properties
+#
+
+# Directory to store the Shipyard database configuration files
+export SHIPYARD_DB_CONF_DIR=$JOB_DIR/config
+
+# Directory to store the Shipyard database logs
+export SHIPYARD_DB_LOG_DIR=$LOG_DIR
+
+# Directory to store the Shipyard database process IDs
+export SHIPYARD_DB_PID_DIR=$RUN_DIR
+
+# Directory to store the Shipyard database data files
+export SHIPYARD_DB_STORE_DIR=$STORE_DIR
+
+# Directory to store the Shipyard database temp files
+export SHIPYARD_DB_TMP_DIR=$TMP_DIR
+
+# User which will own the Docker services
+export DOCKER_USER="<%= p('docker.user') %>"
+
+# Group which will own the Docker services
+export DOCKER_GROUP="<%= p('docker.group') %>"
+
+# Shipyard database type
+export SHIPYARD_DB_TYPE="<%= p('shipyard.db.type') %>"
+
+# Shipyard database user
+export SHIPYARD_DB_USER="<%= p('shipyard.db.user') %>"
+
+# Shipyard database password
+export SHIPYARD_DB_PASS="<%= p('shipyard.db.password') %>"
+
+# Shipyard database name
+export SHIPYARD_DB_NAME="<%= p('shipyard.db.name') %>"
+
+# TCP Port where Shipyard database will listen to
+export SHIPYARD_DB_PORT="<%= p('shipyard.db.port') %>"

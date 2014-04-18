@@ -1,0 +1,21 @@
+---
+name: shipyard_redis
+
+packages:
+  - bosh-helpers
+  - docker
+
+templates:
+  bin/job_properties.sh.erb: bin/job_properties.sh
+  bin/shipyard_redis_ctl: bin/shipyard_redis_ctl
+
+properties:
+  docker.user:
+    description: 'User which will own the Docker services'
+    default: 'root'
+  docker.group:
+    description: 'Group which will own the Docker services'
+    default: 'vcap'
+  shipyard.redis.port:
+    description: 'TCP Port where Shipyard redis will listen to'
+    default: '6379'

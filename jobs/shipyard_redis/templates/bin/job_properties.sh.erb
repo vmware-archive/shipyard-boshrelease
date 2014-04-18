@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+#
+# Shipyard properties
+#
+
+# Directory to store the Shipyard redis configuration files
+export SHIPYARD_REDIS_CONF_DIR=$JOB_DIR/config
+
+# Directory to store the Shipyard redis logs
+export SHIPYARD_REDIS_LOG_DIR=$LOG_DIR
+
+# Directory to store the Shipyard redis process IDs
+export SHIPYARD_REDIS_PID_DIR=$RUN_DIR
+
+# Directory to store the Shipyard redis data files
+export SHIPYARD_REDIS_STORE_DIR=$STORE_DIR
+
+# Directory to store the Shipyard redis temp files
+export SHIPYARD_REDIS_TMP_DIR=$TMP_DIR
+
+# User which will own the Docker services
+export DOCKER_USER="<%= p('docker.user') %>"
+
+# Group which will own the Docker services
+export DOCKER_GROUP="<%= p('docker.group') %>"
+
+# TCP Port where Shipyard redis will listen to
+export SHIPYARD_REDIS_PORT="<%= p('shipyard.redis.port') %>"

@@ -1,0 +1,75 @@
+#!/bin/bash
+
+set -e # exit immediately if a simple command exits with a non-zero status
+
+# Setup common env vars and folders
+source /var/vcap/packages/bosh-helpers/ctl_setup.sh 'shipyard_db'
+export SHIPYARD_DB_PID_FILE=${SHIPYARD_DB_PID_DIR}/shipyard_db.pid
+export SHIPYARD_DB_ID_FILE=${SHIPYARD_DB_PID_DIR}/shipyard_db.id
+
+# Set the hostname
+if hostname=$(public_hostname); then
+  hostname $hostname
+else
+  hostname <%= index %>.<%= name %>.<%= spec.networks.methods(false).grep(/[^=]$/).first.to_s %>.<%= spec.deployment %>.<%= spec.dns_domain_name %>
+fi
+
+case $1 in
+
+  start)
+    pid_guard ${SHIPYARD_DB_PID_FILE} ${JOB_NAME}
+    echo $$ > ${SHIPYARD_DB_PID_FILE}
+
+    # Create Docker user & group
+    create_group ${DOCKER_GROUP}
+    create_user ${DOCKER_USER} ${DOCKER_GROUP}
+
+    # Stop and remove previously Shipyard DB Container
+    chpst -u ${DOCKER_USER}:${DOCKER_GROUP} docker -H unix:///var/vcap/sys/run/docker/docker.sock stop shipyard_db || true
+    chpst -u ${DOCKER_USER}:${DOCKER_GROUP} docker -H unix:///var/vcap/sys/run/docker/docker.sock rm shipyard_db || true
+    rm ${SHIPYARD_DB_ID_FILE} || true
+
+    # Create Shipyard DB persistent disk path
+    if [ ! -d ${SHIPYARD_DB_STORE_DIR}/shipyard_db ]; then
+        mkdir -p ${SHIPYARD_DB_STORE_DIR}/shipyard_db
+        chown ${DOCKER_USER}:${DOCKER_GROUP} ${SHIPYARD_DB_STORE_DIR}/shipyard_db
+        chmod 777 ${SHIPYARD_DB_STORE_DIR}/shipyard_db
+    fi
+
+    # Start Shipyard DB container
+    docker_command="docker --host unix:///var/vcap/sys/run/docker/docker.sock \
+           run --detach \
+           --name shipyard_db \
+           --cidfile ${SHIPYARD_DB_ID_FILE} \
+           --publish ${SHIPYARD_DB_PORT}:5432 \
+           --volume ${SHIPYARD_DB_STORE_DIR}/shipyard_db:/var/lib/postgresql \
+           --env DB_USER="${SHIPYARD_DB_USER}" \
+           --env DB_PASS="${SHIPYARD_DB_PASS}" \
+           --env DB_NAME="${SHIPYARD_DB_NAME}" \
+           shipyard/db"
+
+    echo "$(date) Running command: ${docker_command}"
+    chpst -u ${DOCKER_USER}:${DOCKER_GROUP} ${docker_command} \
+        >>${LOG_DIR}/${OUTPUT_LABEL}.stdout.log \
+        2>>${LOG_DIR}/${OUTPUT_LABEL}.stderr.log
+
+    # Grab Shipyard DB Container process pid
+    container_id=$(cat ${SHIPYARD_DB_ID_FILE})
+    pid_process=$(chpst -u ${DOCKER_USER}:${DOCKER_GROUP} docker -H unix:///var/vcap/sys/run/docker/docker.sock inspect $container_id | grep Pid | awk '{ gsub(",", ""); print $2 }')
+    echo ${pid_process} > ${SHIPYARD_DB_PID_FILE}
+    ;;
+
+  stop)
+    # Stop and remove Shipyard DB Container
+    chpst -u ${DOCKER_USER}:${DOCKER_GROUP} docker -H unix:///var/vcap/sys/run/docker/docker.sock stop shipyard_db || true
+    chpst -u ${DOCKER_USER}:${DOCKER_GROUP} docker -H unix:///var/vcap/sys/run/docker/docker.sock rm shipyard_db || true
+    rm ${SHIPYARD_DB_ID_FILE} || true
+    ;;
+
+  *)
+    echo "Usage: $0 {start|stop}"
+    exit 1
+    ;;
+
+esac
+exit 0

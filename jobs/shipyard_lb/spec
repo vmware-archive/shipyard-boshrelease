@@ -1,0 +1,39 @@
+---
+name: shipyard_lb
+
+packages:
+  - bosh-helpers
+  - docker
+
+templates:
+  bin/job_properties.sh.erb: bin/job_properties.sh
+  bin/shipyard_lb_ctl: bin/shipyard_lb_ctl
+  config/ssl.key.erb: config/ssl.key
+  config/ssl.cert.erb: config/ssl.cert
+
+properties:
+  docker.user:
+    description: 'User which will own the Docker services'
+    default: 'root'
+  docker.group:
+    description: 'Group which will own the Docker services'
+    default: 'vcap'
+  shipyard.redis.host:
+    description: 'Shipyard redis address/hostname'
+    default: '127.0.0.1'
+  shipyard.redis.port:
+    description: 'TCP Port where Shipyard redis will listen to'
+    default: '6379'
+  shipyard.router.port:
+    description: 'TCP Port where Shipyard router will listen to'
+    default: '8080'
+  shipyard.lb.resolver:
+    description: 'Shipyard load balancer DNS resolver for Nginx (default: system dns)'
+  shipyard.lb.routers:
+    description: 'Shipyard load balancer router upstreams address/hostname'
+    default:
+      - '127.0.0.1'
+  shipyard.lb.ssl_key:
+    description: 'SSL private key'
+  shipyard.lb.ssl_cert:
+    description: 'SSL certificate'

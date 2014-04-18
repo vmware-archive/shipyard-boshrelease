@@ -1,0 +1,33 @@
+---
+name: shipyard_db
+
+packages:
+  - bosh-helpers
+  - docker
+
+templates:
+  bin/job_properties.sh.erb: bin/job_properties.sh
+  bin/shipyard_db_ctl: bin/shipyard_db_ctl
+
+properties:
+  docker.user:
+    description: 'User which will own the Docker services'
+    default: 'root'
+  docker.group:
+    description: 'Group which will own the Docker services'
+    default: 'vcap'
+  shipyard.db.type:
+    description: 'Shipyard database type'
+    default: 'postgresql_psycopg2'
+  shipyard.db.user:
+    description: 'Shipyard database user'
+    default: 'shipyard'
+  shipyard.db.password:
+    description: 'Shipyard database password'
+    default: 'c1oudc0w'
+  shipyard.db.name:
+    description: 'Shipyard database name'
+    default: 'shipyard'
+  shipyard.db.port:
+    description: 'TCP Port where Shipyard database will listen to'
+    default: '5432'

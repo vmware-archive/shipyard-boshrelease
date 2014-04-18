@@ -1,0 +1,5 @@
+check process shipyard_router with pidfile /var/vcap/sys/run/shipyard_router/shipyard_router.pid
+  group vcap
+  start program "/var/vcap/packages/bosh-helpers/monit_debugger shipyard_router_ctl '/var/vcap/jobs/shipyard_router/bin/shipyard_router_ctl start'"
+  stop program "/var/vcap/packages/bosh-helpers/monit_debugger shipyard_router_ctl '/var/vcap/jobs/shipyard_router/bin/shipyard_router_ctl stop'"
+  depends on docker

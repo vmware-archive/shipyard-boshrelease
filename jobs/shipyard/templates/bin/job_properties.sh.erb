@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+#
+# Shipyard properties
+#
+
+# Directory to store the Shipyard configuration files
+export SHIPYARD_CONF_DIR=$JOB_DIR/config
+
+# Directory to store the Shipyard logs
+export SHIPYARD_LOG_DIR=$LOG_DIR
+
+# Directory to store the Shipyard process IDs
+export SHIPYARD_PID_DIR=$RUN_DIR
+
+# Directory to store the Shipyard data files
+export SHIPYARD_STORE_DIR=$STORE_DIR
+
+# Directory to store the Shipyard temp files
+export SHIPYARD_TMP_DIR=$TMP_DIR
+
+# User which will own the Docker services
+export DOCKER_USER="<%= p('docker.user') %>"
+
+# Group which will own the Docker services
+export DOCKER_GROUP="<%= p('docker.group') %>"
+
+# TCP Port where Shipyard will listen to
+export SHIPYARD_PORT="<%= p('shipyard.port') %>"
+
+# Shipyard admin password
+export SHIPYARD_ADMIN_PASS="<%= p('shipyard.admin_pass') %>"
+
+# Shipyard debug enabled/disabled
+export SHIPYARD_DEBUG="<%= p('shipyard.debug') %>"
+
+# Shipyard Celery workers
+export SHIPYARD_CELERY_WORKERS="<%= p('shipyard.celery_workers') %>"
+
+# Shipyard database type
+export SHIPYARD_DB_TYPE="<%= p('shipyard.db.type') %>"
+
+# Shipyard database user
+export SHIPYARD_DB_USER="<%= p('shipyard.db.user') %>"
+
+# Shipyard database password
+export SHIPYARD_DB_PASS="<%= p('shipyard.db.password') %>"
+
+# Shipyard database name
+export SHIPYARD_DB_NAME="<%= p('shipyard.db.name') %>"
+
+# Shipyard database address/hostname
+export SHIPYARD_DB_HOST="<%= p('shipyard.db.host') %>"
+
+# TCP Port where Shipyard database will listen to
+export SHIPYARD_DB_PORT="<%= p('shipyard.db.port') %>"
+
+# Shipyard redis address/hostname
+export SHIPYARD_REDIS_HOST="<%= p('shipyard.redis.host') %>"
+
+# TCP Port where Shipyard redis will listen to
+export SHIPYARD_REDIS_PORT="<%= p('shipyard.redis.port') %>"

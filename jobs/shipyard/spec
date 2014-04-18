@@ -1,0 +1,54 @@
+---
+name: shipyard
+
+packages:
+  - bosh-helpers
+  - docker
+
+templates:
+  bin/job_properties.sh.erb: bin/job_properties.sh
+  bin/shipyard_ctl: bin/shipyard_ctl
+
+properties:
+  docker.user:
+    description: 'User which will own the Docker services'
+    default: 'root'
+  docker.group:
+    description: 'Group which will own the Docker services'
+    default: 'vcap'
+  shipyard.port:
+    description: 'Shipyard port'
+    default: '8000'
+  shipyard.admin_pass:
+    description: 'Shipyard admin password'
+    default: 'shipyard'
+  shipyard.debug:
+    description: 'Shipyard debug enabled/disabled'
+    default: 'True'
+  shipyard.celery_workers:
+    description: 'Shipyard Celery workers'
+    default: '4'
+  shipyard.db.type:
+    description: 'Shipyard database type'
+    default: 'postgresql_psycopg2'
+  shipyard.db.user:
+    description: 'Shipyard database user'
+    default: 'shipyard'
+  shipyard.db.password:
+    description: 'Shipyard database password'
+    default: 'c1oudc0w'
+  shipyard.db.name:
+    description: 'Shipyard database name'
+    default: 'shipyard'
+  shipyard.db.host:
+    description: 'Shipyard database address/hostname'
+    default: '127.0.0.1'
+  shipyard.db.port:
+    description: 'TCP Port where Shipyard database will listen to'
+    default: '5432'
+  shipyard.redis.host:
+    description: 'Shipyard redis address/hostname'
+    default: '127.0.0.1'
+  shipyard.redis.port:
+    description: 'TCP Port where Shipyard redis will listen to'
+    default: '6379'

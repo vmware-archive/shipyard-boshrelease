@@ -1,0 +1,86 @@
+#!/bin/bash
+
+set -e # exit immediately if a simple command exits with a non-zero status
+
+# Setup common env vars and folders
+source /var/vcap/packages/bosh-helpers/ctl_setup.sh 'shipyard_lb'
+export SHIPYARD_LB_PID_FILE=${SHIPYARD_LB_PID_DIR}/shipyard_lb.pid
+export SHIPYARD_LB_ID_FILE=${SHIPYARD_LB_PID_DIR}/shipyard_lb.id
+
+# Set the hostname
+if hostname=$(public_hostname); then
+  hostname $hostname
+else
+  hostname <%= index %>.<%= name %>.<%= spec.networks.methods(false).grep(/[^=]$/).first.to_s %>.<%= spec.deployment %>.<%= spec.dns_domain_name %>
+fi
+
+case $1 in
+
+  start)
+    pid_guard ${SHIPYARD_LB_PID_FILE} ${JOB_NAME}
+    echo $$ > ${SHIPYARD_LB_PID_FILE}
+
+    # Create Docker user & group
+    create_group ${DOCKER_GROUP}
+    create_user ${DOCKER_USER} ${DOCKER_GROUP}
+
+    # Stop and remove previously Shipyard LB Container
+    chpst -u ${DOCKER_USER}:${DOCKER_GROUP} docker -H unix:///var/vcap/sys/run/docker/docker.sock stop shipyard_lb || true
+    chpst -u ${DOCKER_USER}:${DOCKER_GROUP} docker -H unix:///var/vcap/sys/run/docker/docker.sock rm shipyard_lb || true
+    rm ${SHIPYARD_LB_ID_FILE} || true
+
+    # Copy/Create SSL files
+    mkdir -p ${SHIPYARD_LB_CERTS_DIR}
+    if [ -s ${SHIPYARD_LB_CONF_DIR}/ssl.key -a -s ${SHIPYARD_LB_CONF_DIR}/ssl.cert ]; then
+        cp ${SHIPYARD_LB_CONF_DIR}/ssl.key ${SHIPYARD_LB_CERTS_DIR}/
+        cp ${SHIPYARD_LB_CONF_DIR}/ssl.cert ${SHIPYARD_LB_CERTS_DIR}/
+    elif [ ! -f ${SHIPYARD_LB_CERTS_DIR}/ssl.key -o ! -f ${SHIPYARD_LB_CERTS_DIR}/ssl.cert ]; then
+        openssl req -nodes -new -newkey rsa:1024 -out ${SHIPYARD_LB_CERTS_DIR}/ssl.csr \
+            -keyout ${SHIPYARD_LB_CERTS_DIR}/ssl.key -subj '/O=Bosh/CN=*'
+        openssl x509 -req -days 3650 -in ${SHIPYARD_LB_CERTS_DIR}/ssl.csr \
+            -signkey ${SHIPYARD_LB_CERTS_DIR}/ssl.key -out ${SHIPYARD_LB_CERTS_DIR}/ssl.cert
+    fi
+    chown -R ${DOCKER_USER}:${DOCKER_GROUP} ${SHIPYARD_LB_CERTS_DIR}
+    chmod -R 0600 ${SHIPYARD_LB_CERTS_DIR}
+
+    # Start Shipyard LB container
+    docker_command="docker --host unix:///var/vcap/sys/run/docker/docker.sock \
+           run --detach \
+           --name shipyard_lb \
+           --cidfile ${SHIPYARD_LB_ID_FILE} \
+           --publish 80:80 \
+           --publish 443:443 \
+           --volume ${SHIPYARD_LB_CERTS_DIR}:/sslcerts \
+           --env REDIS_HOST="${SHIPYARD_REDIS_HOST}" \
+           --env REDIS_PORT="${SHIPYARD_REDIS_PORT}" \
+           --env APP_ROUTER_UPSTREAMS="${SHIPYARD_LB_ROUTERS}" \
+           --env SSL_KEY_PATH="/sslcerts/ssl.key" \
+           --env SSL_CERT_PATH="/sslcerts/ssl.cert" \
+           ${SHIPYARD_LB_RESOLVER:-} \
+           shipyard/lb"
+
+    echo "$(date) Running command: ${docker_command}"
+    chpst -u ${DOCKER_USER}:${DOCKER_GROUP} ${docker_command} \
+        >>${LOG_DIR}/${OUTPUT_LABEL}.stdout.log \
+        2>>${LOG_DIR}/${OUTPUT_LABEL}.stderr.log
+
+    # Grab Shipyard LB Container process pid
+    container_id=$(cat ${SHIPYARD_LB_ID_FILE})
+    pid_process=$(chpst -u $DOCKER_USER:$DOCKER_GROUP docker -H unix:///var/vcap/sys/run/docker/docker.sock inspect $container_id | grep Pid | awk '{ gsub(",", ""); print $2 }')
+    echo ${pid_process} > ${SHIPYARD_LB_PID_FILE}
+    ;;
+
+  stop)
+    # Stop and remove Shipyard LB Container
+    chpst -u ${DOCKER_USER}:${DOCKER_GROUP} docker -H unix:///var/vcap/sys/run/docker/docker.sock stop shipyard_lb || true
+    chpst -u ${DOCKER_USER}:${DOCKER_GROUP} docker -H unix:///var/vcap/sys/run/docker/docker.sock rm shipyard_lb || true
+    rm ${SHIPYARD_LB_ID_FILE} || true
+    ;;
+
+  *)
+    echo "Usage: $0 {start|stop}"
+    exit 1
+    ;;
+
+esac
+exit 0

@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+#
+# Shipyard properties
+#
+
+# Directory to store the Shipyard router configuration files
+export SHIPYARD_ROUTER_CONF_DIR=$JOB_DIR/config
+
+# Directory to store the Shipyard router logs
+export SHIPYARD_ROUTER_LOG_DIR=$LOG_DIR
+
+# Directory to store the Shipyard router process IDs
+export SHIPYARD_ROUTER_PID_DIR=$RUN_DIR
+
+# Directory to store the Shipyard router data files
+export SHIPYARD_ROUTER_STORE_DIR=$STORE_DIR
+
+# Directory to store the Shipyard router temp files
+export SHIPYARD_ROUTER_TMP_DIR=$TMP_DIR
+
+# User which will own the Docker services
+export DOCKER_USER="<%= p('docker.user') %>"
+
+# Group which will own the Docker services
+export DOCKER_GROUP="<%= p('docker.group') %>"
+
+# Shipyard redis address/hostname
+export SHIPYARD_REDIS_HOST="<%= p('shipyard.redis.host') %>"
+
+# TCP Port where Shipyard redis will listen to
+export SHIPYARD_REDIS_PORT="<%= p('shipyard.redis.port') %>"
+
+# TCP Port where Shipyard router will listen to
+export SHIPYARD_ROUTER_PORT="<%= p('shipyard.router.port') %>"
+
+# Shipyard router number of workers
+export SHIPYARD_ROUTER_WORKERS="<%= p('shipyard.router.workers') %>"
+
+# Shipyard router maximum number of sockets
+export SHIPYARD_ROUTER_MAX_SOCKETS="<%= p('shipyard.router.max_sockets') %>"
+
+# Shipyard router number of seconds before backend is labeled dead
+export SHIPYARD_ROUTER_DEAD_BACKEND_TTL="<%= p('shipyard.router.dead_backend_ttl') %>"

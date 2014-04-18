@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+#
+# Shipyard Agent properties
+#
+
+# Directory to store the Shipyard Agent configuration files
+export SHIPYARDAGENT_CONF_DIR=$JOB_DIR/config
+
+# Directory to store the Shipyard Agent logs
+export SHIPYARDAGENT_LOG_DIR=$LOG_DIR
+
+# Directory to store the Shipyard Agent process IDs
+export SHIPYARDAGENT_PID_DIR=$RUN_DIR
+
+# Directory to store the Shipyard Agent data files
+export SHIPYARDAGENT_STORE_DIR=$STORE_DIR
+
+# Directory to store the Shipyard Agent temp files
+export SHIPYARDAGENT_TMP_DIR=$TMP_DIR
+
+# User which will own the Shipyard Agent services
+export SHIPYARDAGENT_USER="<%= p('shipyard.agent.user') %>"
+
+# Group which will own the Shipyard Agent services
+export SHIPYARDAGENT_GROUP="<%= p('shipyard.agent.group') %>"
+
+# Shipyard Agent listen address
+export SHIPYARDAGENT_ADDRESS=<%= p('shipyard.agent.address') %>
+
+# Shipyard Agent listen port
+export SHIPYARDAGENT_PORT=<%= p('shipyard.agent.port') %>
+
+# Shipyard Agent run interval (seconds)
+export SHIPYARDAGENT_RUN_INTERVAL=<%= p('shipyard.agent.interval') %>
+
+# Shipyard Agent metric interval (seconds)
+export SHIPYARDAGENT_METRIC_INTERVAL=<%= p('shipyard.agent.metric-interval') %>
+
+# Shipyard Host
+export SHIPYARD_HOST=<%= p('shipyard.host') %>
+
+# Shipyard port
+export SHIPYARD_PORT=<%= p('shipyard.port') %>
+
+# Local Docker daemon TCP port
+export DOCKER_TCP_PORT=<%= p('docker.tcp_port') %>

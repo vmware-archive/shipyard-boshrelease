@@ -1,0 +1,4 @@
+check process shipyardagent with pidfile /var/vcap/sys/run/shipyardagent/shipyardagent.pid
+  group vcap
+  start program "/var/vcap/packages/bosh-helpers/monit_debugger shipyardagent_ctl '/var/vcap/jobs/shipyardagent/bin/shipyardagent_ctl start'"
+  stop program "/var/vcap/packages/bosh-helpers/monit_debugger shipyardagent_ctl '/var/vcap/jobs/shipyardagent/bin/shipyardagent_ctl stop'"

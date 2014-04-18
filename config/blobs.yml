@@ -1,0 +1,16 @@
+---
+docker/aufs-tools_20120411-3_amd64.deb:
+  object_id: 5c97ebec-17b5-4ead-add9-39e6343f77c5
+  sha: !binary |-
+    MmRmYzFmZTM4NmNkM2YwNWFjN2UwYjRlYmNmM2ViYzhhN2YzYjA0ZA==
+  size: 91762
+docker/docker-0.10.0:
+  object_id: 7253d556-558d-4b10-aa9a-8cb866f709df
+  sha: !binary |-
+    MzgyZjIwNWJjZmM1ODYzNzlhZjk1ZGM5N2Q0OWIzODVjY2E1ODUxZA==
+  size: 16970072
+shipyard/shipyard-agent-0.2.5:
+  object_id: 53fd0c1b-32a7-409d-9e05-a4f92f9ce2d1
+  sha: !binary |-
+    OWVjYTE0NmNiYTAzZjYzYzM5ZGY1YzZlOWIyMDYxNmVhNWQ3NTI4Yw==
+  size: 16749470

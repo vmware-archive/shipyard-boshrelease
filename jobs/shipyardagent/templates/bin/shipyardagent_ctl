@@ -1,0 +1,57 @@
+#!/bin/bash
+
+set -e # exit immediately if a simple command exits with a non-zero status
+
+# Setup common env vars and folders
+source /var/vcap/packages/bosh-helpers/ctl_setup.sh 'shipyardagent'
+export SHIPYARDAGENT_PID_FILE=${SHIPYARDAGENT_PID_DIR}/shipyardagent.pid
+
+# Set the hostname
+if hostname=$(public_hostname); then
+  hostname $hostname
+else
+  hostname <%= index %>.<%= name %>.<%= spec.networks.methods(false).grep(/[^=]$/).first.to_s %>.<%= spec.deployment %>.<%= spec.dns_domain_name %>
+fi
+
+case $1 in
+
+  start)
+    pid_guard ${SHIPYARDAGENT_PID_FILE} $JOB_NAME
+    echo $$ > ${SHIPYARDAGENT_PID_FILE}
+
+    # Create Docker user & group
+    create_group ${SHIPYARDAGENT_GROUP}
+    create_user ${SHIPYARDAGENT_USER} ${SHIPYARDAGENT_GROUP}
+
+    # Register Shipyard agent
+    SHIPYARDAGENT_KEY=$(chpst -u ${SHIPYARDAGENT_USER}:${SHIPYARDAGENT_GROUP} shipyard-agent -register \
+        -url http://${SHIPYARD_HOST}:${SHIPYARD_PORT} 2>&1 | grep 'Agent Key:' | sed 's/.*Key: //g' | tr -d ' ')
+
+     if [ -z ${SHIPYARDAGENT_KEY} ]; then
+        echo "Unable to register agent at http://${SHIPYARD_HOST}:${SHIPYARD_PORT}"
+        exit 1
+     fi
+
+    # Start Shipyard agent
+    exec chpst -u ${SHIPYARDAGENT_USER}:${SHIPYARDAGENT_GROUP} shipyard-agent \
+        -docker http://127.0.0.1:${DOCKER_TCP_PORT} \
+        -url http://${SHIPYARD_HOST}:${SHIPYARD_PORT} \
+        -key ${SHIPYARDAGENT_KEY} \
+        -interval ${SHIPYARDAGENT_RUN_INTERVAL} \
+        -metric-interval ${SHIPYARDAGENT_METRIC_INTERVAL} \
+        -address ${SHIPYARDAGENT_ADDRESS} \
+        -port ${SHIPYARDAGENT_PORT} \
+        >>${LOG_DIR}/${JOB_NAME}.stdout.log 2>>${LOG_DIR}/${JOB_NAME}.stderr.log
+    ;;
+
+  stop)
+    kill_and_wait ${SHIPYARDAGENT_PID_FILE}
+    ;;
+
+  *)
+    echo "Usage: $0 {start|stop}"
+    exit 1
+    ;;
+
+esac
+exit 0

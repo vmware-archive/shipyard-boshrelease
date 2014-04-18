@@ -1,0 +1,75 @@
+#!/bin/bash
+
+set -e # exit immediately if a simple command exits with a non-zero status
+
+# Setup common env vars and folders
+source /var/vcap/packages/bosh-helpers/ctl_setup.sh 'shipyard' 'shipyard'
+export SHIPYARD_PID_FILE=${SHIPYARD_PID_DIR}/shipyard.pid
+export SHIPYARD_ID_FILE=${SHIPYARD_PID_DIR}/shipyard.id
+
+# Set the hostname
+if hostname=$(public_hostname); then
+  hostname $hostname
+else
+  hostname <%= index %>.<%= name %>.<%= spec.networks.methods(false).grep(/[^=]$/).first.to_s %>.<%= spec.deployment %>.<%= spec.dns_domain_name %>
+fi
+
+case $1 in
+
+  start)
+    pid_guard ${SHIPYARD_PID_FILE} ${JOB_NAME}
+    echo $$ > ${SHIPYARD_PID_FILE}
+
+    # Create Docker user & group
+    create_group ${DOCKER_GROUP}
+    create_user ${DOCKER_USER} ${DOCKER_GROUP}
+
+    # Stop and remove previously Shipyard Container
+    chpst -u ${DOCKER_USER}:${DOCKER_GROUP} docker -H unix:///var/vcap/sys/run/docker/docker.sock stop shipyard || true
+    chpst -u ${DOCKER_USER}:${DOCKER_GROUP} docker -H unix:///var/vcap/sys/run/docker/docker.sock rm shipyard || true
+    rm ${SHIPYARD_ID_FILE} || true
+
+    # Start Shipyard container
+    docker_command="docker --host unix:///var/vcap/sys/run/docker/docker.sock \
+           run --detach \
+           --name shipyard \
+           --cidfile ${SHIPYARD_ID_FILE} \
+           --publish ${SHIPYARD_PORT}:8000 \
+           --env ADMIN_PASS="${SHIPYARD_ADMIN_PASS}" \
+           --env DEBUG="${SHIPYARD_DEBUG}" \
+           --env CELERY_WORKERS="${SHIPYARD_CELERY_WORKERS}" \
+           --env DB_TYPE="${SHIPYARD_DB_TYPE}" \
+           --env DB_USER="${SHIPYARD_DB_USER}" \
+           --env DB_PASS="${SHIPYARD_DB_PASS}" \
+           --env DB_NAME="${SHIPYARD_DB_NAME}" \
+           --env DB_HOST="${SHIPYARD_DB_HOST}" \
+           --env DB_PORT="${SHIPYARD_DB_PORT}" \
+           --env REDIS_HOST="${SHIPYARD_REDIS_HOST}" \
+           --env REDIS_PORT="${SHIPYARD_REDIS_PORT}" \
+           shipyard/shipyard app master-worker"
+
+    echo "$(date) Running command: ${docker_command}"
+    chpst -u ${DOCKER_USER}:${DOCKER_GROUP} ${docker_command} \
+        >>${LOG_DIR}/${OUTPUT_LABEL}.stdout.log \
+        2>>${LOG_DIR}/${OUTPUT_LABEL}.stderr.log
+
+    # Grab Shipyard Container process pid
+    container_id=$(cat ${SHIPYARD_ID_FILE})
+    pid_process=$(chpst -u ${DOCKER_USER}:${DOCKER_GROUP} docker -H unix:///var/vcap/sys/run/docker/docker.sock inspect $container_id | grep Pid | awk '{ gsub(",", ""); print $2 }')
+    echo ${pid_process} > ${SHIPYARD_PID_FILE}
+    ;;
+
+  stop)
+    # Stop and remove Shipyard Container
+    chpst -u ${DOCKER_USER}:${DOCKER_GROUP} docker -H unix:///var/vcap/sys/run/docker/docker.sock stop shipyard || true
+    chpst -u ${DOCKER_USER}:${DOCKER_GROUP} docker -H unix:///var/vcap/sys/run/docker/docker.sock rm shipyard || true
+    rm ${SHIPYARD_ID_FILE} || true
+    ;;
+
+  *)
+    echo "Usage: $0 {start|stop}"
+    exit 1
+    ;;
+
+esac
+exit 0

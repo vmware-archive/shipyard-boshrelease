@@ -34,6 +34,7 @@ case $1 in
            run --detach \
            --name shipyard \
            --cidfile ${SHIPYARD_ID_FILE} \
+           --entrypoint "/app/.docker/run.sh" \
            --publish ${SHIPYARD_PORT}:8000 \
            --env ADMIN_PASS="${SHIPYARD_ADMIN_PASS}" \
            --env DEBUG="${SHIPYARD_DEBUG}" \

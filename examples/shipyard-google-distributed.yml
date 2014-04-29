@@ -1,8 +1,9 @@
+<% director_uuid = 'CHANGE-ME' %>
 <% deployment_name = 'shipyard' %>
-<% os = 'ubuntu' %>
+<% static_ip_1 = 'CHANGE-ME' %> # Used for applications (Load Balancer)
+<% static_ip_2 = 'CHANGE-ME' %> # Used for Shipyard UI
 <% tld = 'microbosh' %>
 <% num_nodes = 5 %>
-<% director_uuid = 'CHANGE-ME' %>
 ---
 name: <%= deployment_name %>
 director_uuid: <%= director_uuid %>
@@ -12,7 +13,7 @@ releases:
    version: latest
 
 compilation:
-  workers: 5
+  workers: 1
   network: default
   reuse_compilation_vms: true
   cloud_properties:
@@ -31,14 +32,19 @@ networks:
     cloud_properties:
       ephemeral_external_ip: true
       tags:
+        - bosh
         - <%= deployment_name %>
+
+  - name: static
+    type: vip
+    cloud_properties: {}
 
 resource_pools:
   - name: shipyard
     network: default
     size: 5
     stemcell:
-      name: bosh-google-kvm-<%= os %>
+      name: bosh-google-kvm-ubuntu-trusty
       version: latest
     cloud_properties:
       instance_type: n1-standard-2
@@ -47,7 +53,7 @@ resource_pools:
     network: default
     size: <%= num_nodes %>
     stemcell:
-      name: bosh-google-kvm-<%= os %>
+      name: bosh-google-kvm-ubuntu-trusty
       version: latest
     cloud_properties:
       instance_type: n1-highmem-8
@@ -93,6 +99,9 @@ jobs:
     networks:
       - name: default
         default: [dns, gateway]
+      - name: static
+        static_ips:
+          - <%= static_ip_1 %>
 
   - name: shipyard
     templates:
@@ -103,6 +112,9 @@ jobs:
     networks:
       - name: default
         default: [dns, gateway]
+      - name: static
+        static_ips:
+          - <%= static_ip_2 %>
 
   - name: node
     templates:
@@ -117,7 +129,6 @@ jobs:
 properties:
   shipyard:
     host: 0.shipyard.default.<%= deployment_name %>.<%= tld %>
-    port: 80
     db:
       host: 0.db.default.<%= deployment_name %>.<%= tld %>
     redis:

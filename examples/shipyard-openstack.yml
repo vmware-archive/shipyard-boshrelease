@@ -1,8 +1,8 @@
+<% director_uuid = 'CHANGE-ME' %>
 <% deployment_name = 'shipyard' %>
-<% os = 'ubuntu' %>
+<% floating_ip = 'CHANGE-ME' %>
 <% tld = 'microbosh' %>
 <% num_nodes = 5 %>
-<% director_uuid = 'CHANGE-ME' %>
 ---
 name: <%= deployment_name %>
 director_uuid: <%= director_uuid %>
@@ -12,7 +12,7 @@ releases:
    version: latest
 
 compilation:
-  workers: 5
+  workers: 1
   network: default
   reuse_compilation_vms: true
   cloud_properties:
@@ -29,14 +29,20 @@ networks:
   - name: default
     type: dynamic
     cloud_properties:
-      security_groups: ['default']
+      security_groups:
+        - bosh
+        - <%= deployment_name %>
+
+  - name: floating
+    type: vip
+    cloud_properties: {}
 
 resource_pools:
   - name: shipyard
     network: default
     size: 1
     stemcell:
-      name: bosh-openstack-kvm-<%= os %>
+      name: bosh-openstack-kvm-ubuntu
       version: latest
     cloud_properties:
       instance_type: m1.xlarge
@@ -45,7 +51,7 @@ resource_pools:
     network: default
     size: <%= num_nodes %>
     stemcell:
-      name: bosh-openstack-kvm-<%= os %>
+      name: bosh-openstack-kvm-ubuntu
       version: latest
     cloud_properties:
       instance_type: m1.xlarge
@@ -65,6 +71,9 @@ jobs:
     networks:
       - name: default
         default: [dns, gateway]
+      - name: floating
+        static_ips:
+          - <%= floating_ip %>
 
   - name: node
     templates:

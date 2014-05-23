@@ -2,4 +2,4 @@
 name: shipyard-agent
 dependencies: {}
 files:
-  - shipyard/shipyard-agent-0.2.5
+  - shipyard/shipyard-agent-0.3.1

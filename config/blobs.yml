@@ -14,3 +14,8 @@ shipyard/shipyard-agent-0.2.5:
   sha: !binary |-
     OWVjYTE0NmNiYTAzZjYzYzM5ZGY1YzZlOWIyMDYxNmVhNWQ3NTI4Yw==
   size: 16749470
+shipyard/shipyard-agent-0.3.1:
+  object_id: 9e3769a5-8202-4aea-9876-1c8017456084
+  sha: !binary |-
+    NDhmMjQ0MDM1MWI5YWU0MjM3MmQ2OWM1NGNhNDllZTc1ZDNkNzg2MQ==
+  size: 8377920

@@ -34,7 +34,7 @@ case $1 in
 
     # Start Shipyard agent
     exec chpst -u ${SHIPYARDAGENT_USER}:${SHIPYARDAGENT_GROUP} shipyard-agent \
-        -docker http://127.0.0.1:${DOCKER_TCP_PORT} \
+        -docker ${DOCKER_SOCK} \
         -url http://${SHIPYARD_HOST}:${SHIPYARD_PORT} \
         -key ${SHIPYARDAGENT_KEY} \
         -interval ${SHIPYARDAGENT_RUN_INTERVAL} \

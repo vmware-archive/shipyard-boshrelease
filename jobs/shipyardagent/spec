@@ -10,9 +10,6 @@ templates:
   bin/shipyardagent_ctl: bin/shipyardagent_ctl
 
 properties:
-  docker.tcp_port:
-    description: 'Local Docker daemon TCP port'
-    default: '4243'
   shipyard.host:
     description: 'Shipyard Host'
   shipyard.port:

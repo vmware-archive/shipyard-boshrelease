@@ -43,5 +43,5 @@ export SHIPYARD_HOST=<%= p('shipyard.host') %>
 # Shipyard port
 export SHIPYARD_PORT=<%= p('shipyard.port') %>
 
-# Local Docker daemon TCP port
-export DOCKER_TCP_PORT=<%= p('docker.tcp_port') %>
+# Local Docker socket
+export DOCKER_SOCK=/var/vcap/sys/run/docker/docker.sock

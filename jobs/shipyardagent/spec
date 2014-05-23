@@ -33,6 +33,3 @@ properties:
   shipyard.agent.interval:
     description: 'Shipyard Agent run interval (seconds)'
     default: '5'
-  shipyard.agent.metric-interval:
-    description: 'Shipyard Agent metric interval (seconds)'
-    default: '60'

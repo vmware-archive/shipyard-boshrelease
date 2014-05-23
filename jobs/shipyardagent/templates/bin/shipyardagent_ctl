@@ -38,7 +38,6 @@ case $1 in
         -url http://${SHIPYARD_HOST}:${SHIPYARD_PORT} \
         -key ${SHIPYARDAGENT_KEY} \
         -interval ${SHIPYARDAGENT_RUN_INTERVAL} \
-        -metric-interval ${SHIPYARDAGENT_METRIC_INTERVAL} \
         -address ${SHIPYARDAGENT_ADDRESS} \
         -port ${SHIPYARDAGENT_PORT} \
         >>${LOG_DIR}/${JOB_NAME}.stdout.log 2>>${LOG_DIR}/${JOB_NAME}.stderr.log

@@ -1,0 +1,70 @@
+---
+packages:
+- name: docker
+  version: 2
+  sha1: !binary |-
+    MWU5ZjQ5MzI4ZjVlMTVkMTc2YjhiZTU2ODk1NDcxMDQyZjlkZDM5YQ==
+  fingerprint: !binary |-
+    OGZkNDRhMTkxOWY0YzY0Y2U4MjY4NWE4MjUxOGJlYmFlNGExMGYzYQ==
+  dependencies: []
+- name: shipyard-agent
+  version: 2
+  sha1: !binary |-
+    NDQ0M2VmYTMwZmI4MGI4MTYyM2JmYjZmNTgxYWEzZWI3N2MyOTg2ZA==
+  fingerprint: !binary |-
+    ZWY3NTc2OTliYzI1N2ZlMzZmNzYzNDA4N2ZiNmIyODc4ZTQzNGY5Mw==
+  dependencies: []
+- name: bosh-helpers
+  version: 1
+  sha1: !binary |-
+    ZDAwMjhjMjU1YWJmNjgwNTk2NTNmMmQ2Yjg4MmNjMjM5N2NmMjI0OA==
+  fingerprint: !binary |-
+    Mjg0ZDAyZTcwOTYzZTA4OWI1MmUyZDNlZDY4M2E3Yzg0M2VkMDk0Yg==
+  dependencies: []
+jobs:
+- name: docker
+  version: 1
+  fingerprint: !binary |-
+    Yzk1NmNmOGUyNjNiNTgyNmRiNWY4NDIxOWVkZTQ5OGUxMzQzN2RjMQ==
+  sha1: !binary |-
+    MmUyOThhZThjZTI0NDBmNDljM2M0OTA1OTIzZWZhZTMxMjgyNTAwMQ==
+- name: shipyard_db
+  version: 1
+  fingerprint: !binary |-
+    NTkyZTI4YjliNTFlYzI1ZjE1MzE2YTIyOTZmZmYwOTc4YTRiZmMxZg==
+  sha1: !binary |-
+    MDJmODM3OWViYWMxMGIzYzg2MzQzY2RlNTVjYWY5OGI2MTM0ZmQyZQ==
+- name: shipyard_redis
+  version: 1
+  fingerprint: !binary |-
+    NTI2NjIxMjY4ZWMzM2EwZDM5MjkxNmI3Nzg3NmNhYTQ0M2M0Y2E2Mg==
+  sha1: !binary |-
+    Njc4NDk2MGFmOTkzYWVjZmNlMDE4YTI5YzFhZDMxMWJmMDBmN2JjNw==
+- name: shipyard_router
+  version: 1
+  fingerprint: !binary |-
+    MGI0NGM4YmIwMDIxMTliMDkyNzc4OTliYmFkNTMxNzZjNTYwZGIwYg==
+  sha1: !binary |-
+    ODY1NzgzNmUyNzA3NWUxZDRmY2Q1NWI2NTMwNmVkYmE5ZGMwMzYyYQ==
+- name: shipyardagent
+  version: 2
+  fingerprint: !binary |-
+    ZjM2MDNjODY2NjI3MThlYWQ3OGJkY2U4ZmRhZjFmYTg0MjkyM2VhZA==
+  sha1: !binary |-
+    MThhMzE3Yjg2OGNkZTZiYWQ2MmJmNGIxOTIyNDVhNTdiMGI2MzFlZg==
+- name: shipyard_lb
+  version: 1
+  fingerprint: !binary |-
+    Y2Q1ZGIyYjRiYWRjNWE1MTc1YjJlMmU1OWUyZmM3Yzk3MWI3Mzc0YQ==
+  sha1: !binary |-
+    ZDc2MTNjNDY1ODZmN2UzYTZhZDFhMjg5OGVkN2YzMGM3ZTRjOTQ0Mg==
+- name: shipyard
+  version: 2
+  fingerprint: !binary |-
+    OTM5ZjczNDNiMDdiNTIyZTMyMTQwMzBjMmIxZDRmMGViMWZkYjVlOQ==
+  sha1: !binary |-
+    NjY5OWVkZDIzNGMwZWM4Y2ZjOTBlNTBhNDNkZjE1YjlkNDQxNzZhYQ==
+commit_hash: f215a465
+uncommitted_changes: true
+name: shipyard
+version: 3

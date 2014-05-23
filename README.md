@@ -18,7 +18,7 @@ To use this BOSH release, first upload it to your BOSH:
 bosh target BOSH_HOST
 git clone https://github.com/cf-platform-eng/shipyard-boshrelease.git
 cd shipyard-boshrelease
-bosh upload release releases/shipyard-2.yml
+bosh upload release releases/shipyard-3.yml
 ```
 
 ### Create a BOSH deployment manifest

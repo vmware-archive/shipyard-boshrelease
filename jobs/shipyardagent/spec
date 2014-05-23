@@ -33,3 +33,6 @@ properties:
   shipyard.agent.interval:
     description: 'Shipyard Agent run interval (seconds)'
     default: '5'
+  shipyard.agent.api_version:
+    description: 'Shipyard Agent Docker API Version to use'
+    default: 'v1.9'

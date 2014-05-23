@@ -40,6 +40,7 @@ case $1 in
         -interval ${SHIPYARDAGENT_RUN_INTERVAL} \
         -address ${SHIPYARDAGENT_ADDRESS} \
         -port ${SHIPYARDAGENT_PORT} \
+        -api-version ${SHIPYARDAGENT_API_VERSION} \
         >>${LOG_DIR}/${JOB_NAME}.stdout.log 2>>${LOG_DIR}/${JOB_NAME}.stderr.log
     ;;
 

@@ -1,3 +1,5 @@
+# shipyard-boshrelease is no longer actively maintained by VMware.
+
 # Bosh release for Shipyard
 
 One of the fastest ways to get [Shipyard](http://shipyard-project.com/) and manage multiple [Docker](https://www.docker.io/) hosts on any virtual infrastructure is to deploy this BOSH release.
